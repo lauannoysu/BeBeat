@@ -2,18 +2,20 @@ int setVermelhos[] = { 12, 13 };
 int setAmarelos[] = { 10, 11 };
 int setAzuis[] = { 5, 6 };
 int setVerdes[] = { 8, 7 };
+// sao definadas as variaveis(vetores) que dividem cada grupo LED pela cor, cada grupo guarda 2 pinos(cada pino responsavel por acender 2 LEDs, via conexão paralela) no arduino uno {x,y};
 
-unsigned long tempoInicio;
-bool ledsAcesos = false;
-bool rodadaIniciada = false;
-int *setAtivo = nullptr;
+unsigned long tempoInicio;  // criação de uma variavel que posteriormente servirá para calcular o tempo que o jogo ficou ligado
+bool ledsAcesos = false;  // variavel booleana true/false dizendo que devem estar desligados
+bool rodadaIniciada = false; // controla inicio/fim de rodada
+int *setAtivo = nullptr; //  "ponteiro" que aponta para o vetor da cor sorteada
 int buzzer = 9;  // pino do buzzer
 
-int escolhido = -1;
+int escolhido = -1; // cada set recebe um desses valores 0, 1, 2 ou 3. -1 significa nenhum set escolhido ainda
 // Joystick
 int pinX = A0;
 int pinY = A1;
 int pinSW = 2;
+// pino analogico onde está conectado cada funçao do joystick
 
 const int NUM_LEDS = 2;
 
@@ -27,7 +29,7 @@ const char *nomesSets[] = { "Vermelho", "Amarelo", "Azul", "Verde" };
 
 // Tempo aceso
 unsigned long tempoAceso = 4000;
-int ultimaVelocidade = 4000;
+int ultimaVelocidade = 4000; // serve para o calculo de mudança de vel. posteriormente
 
 // Pontuacao
 int Score = 0;
@@ -37,7 +39,7 @@ int erros = 0;
 bool pausado = false;
 
 void setup() {
-  Serial.begin(9600);
+  Serial.begin(9600); // inicia a comunicação entre computador e arduino, parametro 9600: define a velocidade de transmissão em bits por segundo
   pinMode(pinSW, INPUT_PULLUP);
   pinMode(buzzer, OUTPUT);
 
@@ -53,7 +55,8 @@ void setup() {
 
   randomSeed(analogRead(A0));
 }
-
+//configura o botao joystick e buzzer, configura todos os pinos de LEDs como saida
+//espera o jogador pressionar o botao para começar e random = para gerar números aleatorios diferentes a cada partida
 void loop() {
 
  if (digitalRead(pinSW) == LOW) {  // botão pressionado
@@ -117,7 +120,7 @@ void lerJoystick() {
   } else {
     direcaoAtual = "Centro";
   }
-
+//conversao dos valores em direção 
   // Serial.println(direcaoAtual);
 }
 
@@ -197,7 +200,7 @@ void somErro() {
 
   delay(200);
 }
-
+//confighura o buzzwer e seus respectivas frequências
 void efeitoTrocaDeFase() {
   somPowerUp();
   for (int k = 0; k < 5; k++) {
@@ -255,7 +258,10 @@ void somPowerUp() {
 
   noTone(buzzer);
 }
-
+// Toca sequência de notas ascendentes no buzzer.
+//Cada nota tem duração diferente.
+//Apaga buzzer no final (noTone()).
+//Cada nota tem duração diferente. Apaga buzzer no final (noTone()).
 void piscarLuz() {
   for (int j = 0; j < NUM_LEDS; j++) {
     digitalWrite(setAtivo[j], LOW);
@@ -272,7 +278,7 @@ void flashTransicao() {
       digitalWrite(setVerdes[i], HIGH);
     }
     delay(80);
-
+// pisca todos 2x os leds antes de iniciar uma rodada, indicando a transição ligado/offf
     // DESLIGA TODOS
     for (int i = 0; i < NUM_LEDS; i++) {
       digitalWrite(setVermelhos[i], LOW);
@@ -283,4 +289,5 @@ void flashTransicao() {
     delay(80);
   }
 }
+
 
